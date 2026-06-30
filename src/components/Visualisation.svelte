@@ -30,6 +30,7 @@
   import { visState } from '../lib/state.svelte';
   import { plotPadding } from '../lib/constants';
   import { untrack } from 'svelte';
+  import { cubicInOut } from 'svelte/easing';
 
   interface Props {
     showConstructionMarks?: boolean;
@@ -99,19 +100,12 @@
   // TODO: Warn if there are too many categories.
   let seriesColors = $derived(getDefaultPalette(visState.config.series));
 
-  // let annotations = $derived.by(() => {
-  //   return visState.config.annotations.filter(d => {
-  //     console.log(d)
-  //     return !d.deleted;
-  //   });
-  // });
   let annotations = $derived.by(() => {
     return visState.config.annotations.filter(d => {
-      void d.label; // Force tracking of label
-      console.log(d)
       return !d.deleted;
     });
   });
+
   let arrows = $derived(visState.config.arrows.filter(d => !d.deleted));
   let series = $derived(visState.config.series.filter(d => !d.deleted));
 
@@ -141,17 +135,35 @@
     )
   );
 
+  const tweenConfig = { duration: 1000, easing: cubicInOut };
+
   let xAxisDomainTween = $derived.by(() => {
     if (flatData.length === 0) return undefined;
-    if (xAxisDataType === 'number') return new Tween(untrack(() => xDomain));
-    if (xAxisDataType === 'date') return new Tween(untrack(() => xDomain));
+    if (xAxisDataType === 'number')
+      return new Tween(
+        untrack(() => xDomain),
+        tweenConfig
+      );
+    if (xAxisDataType === 'date')
+      return new Tween(
+        untrack(() => xDomain),
+        tweenConfig
+      );
     return undefined;
   });
 
   let yAxisDomainTween = $derived.by(() => {
     if (flatData.length === 0) return undefined;
-    if (yAxisDataType === 'number') return new Tween(untrack(() => yDomain));
-    if (yAxisDataType === 'date') return new Tween(untrack(() => yDomain));
+    if (yAxisDataType === 'number')
+      return new Tween(
+        untrack(() => yDomain),
+        tweenConfig
+      );
+    if (yAxisDataType === 'date')
+      return new Tween(
+        untrack(() => yDomain),
+        tweenConfig
+      );
     return undefined;
   });
 
@@ -180,9 +192,10 @@
     // Fallback simple chartWidth / 130px calculation
     if (!xDomain || xAxisDataType === 'string') return Math.floor(chartWidth / 130);
 
-    const tempScale = xAxisDataType === 'date'
-      ? scaleTime().domain(xDomain as unknown as Date[])
-      : scaleLinear().domain(xDomain as unknown as number[]);
+    const tempScale =
+      xAxisDataType === 'date'
+        ? scaleTime().domain(xDomain as unknown as Date[])
+        : scaleLinear().domain(xDomain as unknown as number[]);
 
     // Generate some temporary ticks
     const sampleTicks = tempScale.ticks(10);
