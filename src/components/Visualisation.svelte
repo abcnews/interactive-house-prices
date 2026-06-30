@@ -135,7 +135,7 @@
     )
   );
 
-  const tweenConfig = { duration: 1000, easing: cubicInOut };
+  const tweenConfig = { duration: 1800, easing: cubicInOut };
 
   let xAxisDomainTween = $derived.by(() => {
     if (flatData.length === 0) return undefined;
