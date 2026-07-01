@@ -4,6 +4,7 @@
   import { scaleOrdinal, scaleTime, scaleLinear } from 'd3-scale';
   import { csvParse } from 'd3-dsv';
   import { getMountValue, selectMounts } from '@abcnews/mount-utils';
+  import { prefersReducedMotion } from '@abcnews/env-utils';
   import { onMount } from 'svelte';
 
   import FontProvider from './FontProvider.svelte'; // TODO Swap out for @abcnews/components-storylab version
@@ -41,7 +42,9 @@
 
   let { showConstructionMarks = false }: Props = $props();
 
-  let tweenDuration = $state(1800);
+  const TWEEN_DURATION = 1800;
+  const TWEEN_DURATION_REDUCED = 100;
+  let tweenDuration = $state(TWEEN_DURATION);
 
   // TODO: Move fetched and parsed data to a central state object from state.svelte.ts
   // A state variable to store the raw data from each of the data sources defined in the config.
@@ -181,6 +184,15 @@
   $effect(() => {
     if (yDomain && yAxisDomainTween) {
       yAxisDomainTween.target = yDomain;
+    }
+  });
+
+  $effect(() => {
+    console.log($prefersReducedMotion);
+    if ($prefersReducedMotion) {
+      tweenDuration = TWEEN_DURATION_REDUCED;
+    } else {
+      tweenDuration = TWEEN_DURATION;
     }
   });
 
@@ -334,4 +346,14 @@
       font-size: 20px;
     }
   }
+
+  :global {
+      body {
+        overflow-x: clip !important;
+      }
+      body[data-newsapp] {
+        overflow: clip;
+        isolation: isolate;
+      }
+    }
 </style>
