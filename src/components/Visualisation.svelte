@@ -3,6 +3,9 @@
   import { Tween } from 'svelte/motion';
   import { scaleOrdinal, scaleTime, scaleLinear } from 'd3-scale';
   import { csvParse } from 'd3-dsv';
+  import { getMountValue, selectMounts } from '@abcnews/mount-utils';
+  import { onMount } from 'svelte';
+
   import FontProvider from './FontProvider.svelte'; // TODO Swap out for @abcnews/components-storylab version
   import AxisX from './layercake-components/AxisX.svg.svelte';
   import AxisY from './layercake-components/AxisY.svg.svelte';
@@ -37,6 +40,8 @@
   }
 
   let { showConstructionMarks = false }: Props = $props();
+
+  let tweenDuration = $state(1800);
 
   // TODO: Move fetched and parsed data to a central state object from state.svelte.ts
   // A state variable to store the raw data from each of the data sources defined in the config.
@@ -135,7 +140,7 @@
     )
   );
 
-  const tweenConfig = { duration: 1800, easing: cubicInOut };
+  const tweenConfig = $derived({ duration: tweenDuration, easing: cubicInOut });
 
   let xAxisDomainTween = $derived.by(() => {
     if (flatData.length === 0) return undefined;
@@ -210,6 +215,10 @@
     );
 
     return Math.floor(chartWidth / (maxLabelLength * ESTIMATED_CHARACTER_WIDTH + TICK_LABEL_GAP));
+  });
+
+  onMount(() => {
+    // console.log("Hello...")
   });
 </script>
 

@@ -53,7 +53,7 @@
     fill: none;
     stroke-linejoin: round;
     stroke-linecap: round;
-    stroke-width: 2px;
+    stroke-width: 3px;
     stroke-dasharray: var(--line-dasharray, none);
 
     &.outline {
